@@ -3,6 +3,10 @@ using System.Collections.Generic;
 using CabInvoiceGenerator;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
+using System.Collections.Generic;
+using CabInvoiceGenerator;
+
+
 namespace UnitTest
 {
     [TestClass]
@@ -44,6 +48,20 @@ namespace UnitTest
             Ride ride = new Ride(1, -1);
             InvoiceGeneratorException invoiceGeneratorException2 = Assert.ThrowsException<InvoiceGeneratorException>(() => invoiceGeneratorNormalRide.TotalFareForSingleRiderreturn(ride));
             Assert.AreEqual(invoiceGeneratorException2.type, InvoiceGeneratorException.ExceptionType.INVALID_TIME);
+        }
+        //<summary>
+        //UC2: Checking for multiple rides and aggregate fare
+        //</summary>
+        [TestMethod]
+        public void GivenListOfRides_CalculateFareForMultipleRides()
+        {
+            Ride ride1 = new Ride(2, 2);
+            Ride ride2 = new Ride(2, 1);
+
+            List<Ride> rides = new List<Ride>();
+            rides.Add(ride1);
+            rides.Add(ride2);
+            Assert.AreEqual(43.0d, invoiceGeneratorNormalRide.TotalFareForMultipleRideReturn(rides));
         }
     }
 }
