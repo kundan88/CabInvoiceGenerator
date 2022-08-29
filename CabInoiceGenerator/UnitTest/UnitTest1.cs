@@ -1,9 +1,6 @@
 using System.Collections.Generic;
 using CabInvoiceGenerator;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System.Collections.Generic;
-using CabInvoiceGenerator;
-
 
 namespace UnitTest
 {
@@ -11,12 +8,13 @@ namespace UnitTest
     public class Tests
     {
         InvoiceGenerator invoiceGeneratorNormalRide;
-     
+        RideServices rideServices;
 
         [TestMethod]
         public void Setup()
         {
             invoiceGeneratorNormalRide = new InvoiceGenerator();
+            rideServices = new RideServices();
         }
         /// <summary>
         /// UC1:Calculate the normal ride fare
@@ -77,6 +75,35 @@ namespace UnitTest
             Assert.AreEqual(43.0d, invoiceGeneratorNormalRide.TotalFareForMultipleRideReturn(rides));
             Assert.AreEqual(21.5d, invoiceGeneratorNormalRide.averagePerRide);
             Assert.AreEqual(2, invoiceGeneratorNormalRide.numOfRides);
+        }
+        ///<summary>
+        ///UC4: Checking fare of user with valid UserId
+        ///</summary>
+        [TestMethod]
+        public void GivenValidUser_GenerateInvoice()
+        {
+            Ride ride1 = new Ride(2, 2);
+            Ride ride2 = new Ride(2, 1);
+            rideServices.AddRideRespository("RT", ride1);
+            rideServices.AddRideRespository("RT", ride2);
+
+            Assert.AreEqual(43.0d, invoiceGeneratorNormalRide.TotalFareForMultipleRideReturn(rideServices.returnListByUserId("RT")));
+            Assert.AreEqual(21.5d, invoiceGeneratorNormalRide.averagePerRide);
+            Assert.AreEqual(2, invoiceGeneratorNormalRide.numOfRides);
+        }
+        ///<summary>
+        ///TC4.1: Checking fare of user with Invalid UserId
+        ///</summary>
+        [TestMethod]
+        public void GivenInValidUser_GenerateInvoice()
+        {
+            Ride ride1 = new Ride(2, 2);
+            Ride ride2 = new Ride(2, 1);
+            rideServices.AddRideRespository("RT", ride1);
+            rideServices.AddRideRespository("RT", ride2);
+
+            var Exception = Assert.ThrowsException<InvoiceGeneratorException>(() => invoiceGeneratorNormalRide.TotalFareForMultipleRideReturn(rideServices.returnListByUserId("TR")));
+            Assert.AreEqual(Exception.type, InvoiceGeneratorException.ExceptionType.INVALID_USER_ID);
         }
     }
 }
